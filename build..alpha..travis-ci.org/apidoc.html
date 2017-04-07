@@ -1,0 +1,214 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/aceakash/string-similarity#readme"
+
+    >string-similarity (v1.1.0)</a>
+</h1>
+<h4>Finds degree of similarity between strings, based on Dice's Coefficient, which is mostly better than Levenshtein distance.</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.string-similarity">module string-similarity</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.string-similarity.compareTwoStrings">
+            function <span class="apidocSignatureSpan">string-similarity.</span>compareTwoStrings
+            <span class="apidocSignatureSpan">(str1, str2)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.string-similarity.findBestMatch">
+            function <span class="apidocSignatureSpan">string-similarity.</span>findBestMatch
+            <span class="apidocSignatureSpan">(mainString, targetStrings)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.string-similarity" id="apidoc.module.string-similarity">module string-similarity</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.string-similarity.compareTwoStrings" id="apidoc.element.string-similarity.compareTwoStrings">
+        function <span class="apidocSignatureSpan">string-similarity.</span>compareTwoStrings
+        <span class="apidocSignatureSpan">(str1, str2)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function compareTwoStrings(str1, str2) {
+  var pairs1 = wordLetterPairs(str1.toUpperCase());
+  var pairs2 = wordLetterPairs(str2.toUpperCase());
+  var intersection = 0;
+  var union = pairs1.length + pairs2.length;
+
+  _forEach(pairs1, function (pair1) {
+    for(var i = 0; i &#x3c; pairs2.length; i++) {
+      var pair2 = pairs2[i];
+      if (pair1 === pair2) {
+        intersection++;
+        pairs2.splice(i, 1);
+        break;
+      }
+    }
+  });
+
+  return (2.0 * intersection) / union;
+
+  // private functions ---------------------------
+  function letterPairs(str) {
+    var numPairs = str.length - 1;
+    var pairs = [];
+    for(var i = 0; i &#x3c; numPairs; i++) {
+      pairs[i] = str.substring(i, i + 2);
+    }
+    return pairs;
+  }
+
+  function wordLetterPairs(str) {
+    return _flattenDeep(_map(str.split(&#x27; &#x27;), letterPairs));
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+```
+
+In your code:
+
+```javascript
+var stringSimilarity = require(&#x27;string-similarity&#x27;);
+
+var similarity = stringSimilarity.<span class="apidocCodeKeywordSpan">compareTwoStrings</span>(&#x27;healed&#x27;, &#x27;sealed&#
+x27;);
+
+var matches = stringSimilarity.findBestMatch(&#x27;healed&#x27;, [&#x27;edward&#x27;, &#x27;sealed&#x27;, &#x27;theatre&#x27;]);
+```
+## API
+
+Requiring the module gives an object with two methods:
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.string-similarity.findBestMatch" id="apidoc.element.string-similarity.findBestMatch">
+        function <span class="apidocSignatureSpan">string-similarity.</span>findBestMatch
+        <span class="apidocSignatureSpan">(mainString, targetStrings)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function findBestMatch(mainString, targetStrings) {
+  if (!areArgsValid(mainString, targetStrings)) {
+    throw new Error(&#x27;Bad arguments: First argument should be a string, second should be an array of strings&#x27;);
+  }
+  var ratings = _map(targetStrings, function (targetString) {
+    return {
+      target: targetString,
+      rating: compareTwoStrings(mainString, targetString)
+    };
+  });
+
+  return {
+    ratings: ratings,
+    bestMatch: _maxBy(ratings, &#x27;rating&#x27;)
+  };
+
+  // private functions ---------------------------
+  function areArgsValid(mainString, targetStrings) {
+    var mainStringIsAString = (typeof mainString === &#x27;string&#x27;);
+
+    var targetStringsIsAnArrayOfStrings = Array.isArray(targetStrings) &#x26;&#x26;
+      targetStrings.length &#x3e; 0 &#x26;&#x26;
+      _every(targetStrings, function (targetString) {
+        return (typeof targetString === &#x27;string&#x27;);
+      });
+
+    return mainStringIsAString &#x26;&#x26; targetStringsIsAnArrayOfStrings;
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+In your code:
+
+```javascript
+var stringSimilarity = require(&#x27;string-similarity&#x27;);
+
+var similarity = stringSimilarity.compareTwoStrings(&#x27;healed&#x27;, &#x27;sealed&#x27;);
+
+var matches = stringSimilarity.<span class="apidocCodeKeywordSpan">findBestMatch</span>(&#x27;healed&#x27;, [&#x27;edward&#x27;, &#
+x27;sealed&#x27;, &#x27;theatre&#x27;]);
+```
+## API
+
+Requiring the module gives an object with two methods:
+
+### compareTwoStrings(string1, string2)
+...</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
